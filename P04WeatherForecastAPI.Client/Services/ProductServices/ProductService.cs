@@ -26,6 +26,16 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
             _appSettings= appSettings.Value;
         }
 
+        public Task<ServiceResponse<Product>> CreateProductAsync(Product product)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResponse<bool>> DeleteProductAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
 
         //// skopiowane z postmana 
         //public async Task<ServiceResponse<List<Product>>> GetProductsAsync()
@@ -47,6 +57,11 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
             var json = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ServiceResponse<List<Product>>>(json);
             return result;
+        }
+
+        public Task<ServiceResponse<Product>> UpdateProductAsync(Product product)
+        {
+            throw new NotImplementedException();
         }
     }
 }

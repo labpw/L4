@@ -1,4 +1,6 @@
-﻿using P06Shop.Shared;
+﻿using Microsoft.EntityFrameworkCore;
+using P05Shop.API.Models;
+using P06Shop.Shared;
 using P06Shop.Shared.Services.ProductService;
 using P06Shop.Shared.Shop;
 using P07Shop.DataSeeder;
@@ -7,13 +9,43 @@ namespace P05Shop.API.Services.ProductService
 {
     public class ProductService : IProductService
     {
+        private readonly DataContext _dataContext;
+        public ProductService(DataContext context)
+        {
+            _dataContext = context;
+        }
+
+        public async Task<ServiceResponse<Product>> CreateProductAsync(Product product)
+        {
+            _dataContext.Products.Add(product);
+            await _dataContext.SaveChangesAsync();
+            return new ServiceResponse<Product>() { Data = product, Success= true };
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)
+        {
+            // sposób 1 (najpierw znajdujemy potem go usuwamy): 
+            //var productToDelete = _dataContext.Products.FirstOrDefault(x => x.Id == id);
+            //_dataContext.Products.Remove(productToDelete);  
+
+            // sposób 2: (uzywamy attach : tylko jedno zapytanie do bazy)
+            var product = new Product() { Id = id };
+            _dataContext.Products.Attach(product);
+            _dataContext.Products.Remove(product);
+            await _dataContext.SaveChangesAsync();
+
+            return new ServiceResponse<bool>() {  Data = true };
+        }
+
         public async Task<ServiceResponse<List<Product>>> GetProductsAsync()
         {
+            var products = await _dataContext.Products.ToListAsync();
+
             try
             {
                 var response = new ServiceResponse<List<Product>>()
                 {
-                    Data = ProductSeeder.GenerateProductData(),
+                    Data = products,
                     Message = "Ok",
                     Success = true
                 };
@@ -25,11 +57,27 @@ namespace P05Shop.API.Services.ProductService
                 return new  ServiceResponse<List<Product>>()
                 {
                     Data = null,
-                    Message = "Problem with dataseeder library",
+                    Message = "Problem with database",
                     Success = false
                 };
             }
            
+        }
+
+        public async Task<ServiceResponse<Product>> UpdateProductAsync(Product product)
+        {
+            var productToEdit = new Product() { Id = product.Id };
+            _dataContext.Products.Attach(productToEdit);
+
+            productToEdit.Title = product.Title;
+            productToEdit.Description = product.Description;
+            productToEdit.Price = product.Price;
+            productToEdit.Barcode = product.Barcode;
+            productToEdit.ReleaseDate = product.ReleaseDate;
+
+            await _dataContext.SaveChangesAsync();
+
+            return new ServiceResponse<Product> { Data = productToEdit };
         }
     }
 }
