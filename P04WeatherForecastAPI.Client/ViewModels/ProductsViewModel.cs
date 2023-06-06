@@ -96,7 +96,7 @@ namespace P04WeatherForecastAPI.Client.ViewModels
         [RelayCommand]
         public async void Save()
         {
-            if (selectedProduct.Id ==null)
+            if (selectedProduct.Id ==0)
             {
                 CreateProduct();
             }else
@@ -117,6 +117,8 @@ namespace P04WeatherForecastAPI.Client.ViewModels
         {
             _productDetailsView.Show();
             _productDetailsView.DataContext = this;
+            selectedProduct = new Product();
+            OnPropertyChanged("SelectedProduct");
         }
 
 
