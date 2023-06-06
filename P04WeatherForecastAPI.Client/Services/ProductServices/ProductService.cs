@@ -36,9 +36,17 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
 
         public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)
         {
-            var response = await _httpClient.DeleteAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint + $"/{id}");
-            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
-            return result;
+            using(HttpClient _httpClient = new HttpClient())
+            {
+                _httpClient.BaseAddress = new Uri(_appSettings.BaseAPIUrl);
+                var response = await _httpClient.DeleteAsync(_appSettings.BaseProductEndpoint.Base_url + $"/{id}");
+                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+                return result;
+            }
+            //_httpClient.BaseAddress = new Uri(_appSettings.BaseAPIUrl);
+            //var response = await _httpClient.DeleteAsync(_appSettings.BaseProductEndpoint.Base_url+ $"/{id}");
+            //var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            //return result;
         }
 
 

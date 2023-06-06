@@ -20,8 +20,12 @@ namespace P04WeatherForecastAPI.Client.ViewModels
         private readonly ProductDetailsView _productDetailsView;
         public ObservableCollection<Product> Products { get; set; }
 
+    
+
         [ObservableProperty]
-        private Product selectedProduct;  
+        private Product selectedProduct;
+
+     
 
         public ProductsViewModel(IProductService productService, ProductDetailsView productDetailsView)
         {
@@ -83,8 +87,38 @@ namespace P04WeatherForecastAPI.Client.ViewModels
         public async void ShowDetails(Product product)
         {
             _productDetailsView.Show();
-            _productDetailsView.DataContext = product;
+            _productDetailsView.DataContext = this;
+            selectedProduct = product;
+            OnPropertyChanged("SelectedProduct");
         }
+
+
+        [RelayCommand]
+        public async void Save()
+        {
+            if (selectedProduct.Id ==null)
+            {
+                CreateProduct();
+            }else
+            {
+                UpdateProduct();
+            }
+            
+        }
+
+        [RelayCommand]
+        public async void Delete()
+        {
+            DeleteProduct();
+        }
+
+        [RelayCommand]
+        public async void New()
+        {
+            _productDetailsView.Show();
+            _productDetailsView.DataContext = this;
+        }
+
 
     }
 }
