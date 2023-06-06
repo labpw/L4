@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using P04WeatherForecastAPI.Client.MessageBox;
 using P04WeatherForecastAPI.Client.Models;
 using P04WeatherForecastAPI.Client.Services.WeatherServices;
 using P06Shop.Shared.Services.ProductService;
@@ -18,6 +19,7 @@ namespace P04WeatherForecastAPI.Client.ViewModels
     {
         private readonly IProductService _productService;
         private readonly ProductDetailsView _productDetailsView;
+        private readonly IMessageDialogService _messageDialogService;
         public ObservableCollection<Product> Products { get; set; }
 
     
@@ -27,15 +29,18 @@ namespace P04WeatherForecastAPI.Client.ViewModels
 
      
 
-        public ProductsViewModel(IProductService productService, ProductDetailsView productDetailsView)
+        public ProductsViewModel(IProductService productService, ProductDetailsView productDetailsView,
+            IMessageDialogService messageDialogService)
         {
+            _messageDialogService = messageDialogService;
             _productDetailsView = productDetailsView;
             _productService = productService;
             Products = new ObservableCollection<Product>();          
         }
 
-        public async void GetProducts()
+        public async Task GetProducts()
         {
+            Products.Clear();
             var productsResult = await _productService.GetProductsAsync();
             if (productsResult.Success)
             {
@@ -46,7 +51,7 @@ namespace P04WeatherForecastAPI.Client.ViewModels
             }
         }
 
-        public async void CreateProduct()
+        public async Task CreateProduct()
         {
             var newProduct = new Product()
             {
@@ -57,11 +62,14 @@ namespace P04WeatherForecastAPI.Client.ViewModels
                 ReleaseDate = selectedProduct.ReleaseDate,
             };
 
-            await _productService.CreateProductAsync(newProduct);
-            GetProducts();
+            var result= await _productService.CreateProductAsync(newProduct);
+            if (result.Success)
+                await GetProducts();
+            else
+                _messageDialogService.ShowMessage(result.Message);
         }
 
-        public async void UpdateProduct()
+        public async Task UpdateProduct()
         {
             var productToUpdate = new Product()
             {
@@ -74,53 +82,53 @@ namespace P04WeatherForecastAPI.Client.ViewModels
             };
 
             await _productService.UpdateProductAsync(productToUpdate);
-            GetProducts();
+            await GetProducts();
         }
 
-        public async void DeleteProduct()
+        public async Task DeleteProduct()
         {
             await _productService.DeleteProductAsync(selectedProduct.Id);
-            GetProducts();
-        }
-
-        [RelayCommand]
-        public async void ShowDetails(Product product)
-        {
-            _productDetailsView.Show();
-            _productDetailsView.DataContext = this;
-            selectedProduct = product;
-            OnPropertyChanged("SelectedProduct");
+            await GetProducts();
         }
 
 
+
+
         [RelayCommand]
-        public async void Save()
+        public async Task Save()
         {
             if (selectedProduct.Id ==0)
             {
-                CreateProduct();
+                await CreateProduct();
             }else
             {
-                UpdateProduct();
+                await UpdateProduct();
             }
             
         }
 
         [RelayCommand]
-        public async void Delete()
+        public async Task Delete()
         {
             DeleteProduct();
         }
 
         [RelayCommand]
-        public async void New()
+        public async Task New()
         {
             _productDetailsView.Show();
             _productDetailsView.DataContext = this;
-            selectedProduct = new Product();
-            OnPropertyChanged("SelectedProduct");
+            SelectedProduct = new Product();
+          //  OnPropertyChanged("SelectedProduct");
         }
 
-
+        [RelayCommand]
+        public async Task ShowDetails(Product product)
+        {
+            _productDetailsView.Show();
+            _productDetailsView.DataContext = this;
+            SelectedProduct = product;
+            //OnPropertyChanged("SelectedProduct");
+        }
     }
 }

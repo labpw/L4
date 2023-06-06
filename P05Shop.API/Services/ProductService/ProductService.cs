@@ -17,9 +17,23 @@ namespace P05Shop.API.Services.ProductService
 
         public async Task<ServiceResponse<Product>> CreateProductAsync(Product product)
         {
-            _dataContext.Products.Add(product);
-            await _dataContext.SaveChangesAsync();
-            return new ServiceResponse<Product>() { Data = product, Success= true };
+            try
+            {
+                _dataContext.Products.Add(product);
+                await _dataContext.SaveChangesAsync();
+                return new ServiceResponse<Product>() { Data = product, Success = true };
+            }
+            catch (Exception)
+            {
+                return new ServiceResponse<Product>()
+                {
+                    Data = null,
+                    Message = "Problem with database",
+                    Success = false
+                };
+
+            }
+            
         }
 
         public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)

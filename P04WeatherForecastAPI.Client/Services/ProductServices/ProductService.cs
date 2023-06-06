@@ -29,9 +29,11 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
 
         public async Task<ServiceResponse<Product>> CreateProductAsync(Product product)
         {
-            var response = await _httpClient.PostAsJsonAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint, product);
-            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Product>>();
-            return result;
+            
+                var response = await _httpClient.PostAsJsonAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint, product);
+                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Product>>();
+                return result;      
+           
         }
 
         public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)
