@@ -35,39 +35,37 @@ namespace P05Shop.API.Controllers
         [HttpPut]
         public async Task<ActionResult<ServiceResponse<Product>>> UpdateProduct([FromBody] Product product)
         {
-            throw new NotImplementedException();
-            //var result = await _productService.GetProductsAsync();
+            
+            var result = await _productService.UpdateProductAsync(product);
 
-            //if (result.Success)
-            //    return Ok(result);
-            //else
-            //    return StatusCode(500, $"Internal server error {result.Message}");
+            if (result.Success)
+                return Ok(result);
+            else
+                return StatusCode(500, $"Internal server error {result.Message}");
         }
 
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<Product>>> CreateProduct([FromBody] Product product)
         {
-            throw new NotImplementedException();
-            //var result = await _productService.GetProductsAsync();
+            var result = await _productService.CreateProductAsync(product);
 
-            //if (result.Success)
-            //    return Ok(result);
-            //else
-            //    return StatusCode(500, $"Internal server error {result.Message}");
+            if (result.Success)
+                return Ok(result);
+            else
+                return StatusCode(500, $"Internal server error {result.Message}");
         }
 
         // http:localhost/api/product/delete?id=4
         // http:localhost/api/product/4 dla api REST
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ServiceResponse<Product>>> DeleteProduct([FromRoute] int id)
+        public async Task<ActionResult<ServiceResponse<bool>>> DeleteProduct([FromRoute] int id)
         {
-            throw new NotImplementedException();
-            //var result = await _productService.GetProductsAsync();
+            var result = await _productService.DeleteProductAsync(id);
 
-            //if (result.Success)
-            //    return Ok(result);
-            //else
-            //    return StatusCode(500, $"Internal server error {result.Message}");
+            if (result.Success)
+                return Ok(result);
+            else
+                return StatusCode(500, $"Internal server error {result.Message}");
         }
 
 

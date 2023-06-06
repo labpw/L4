@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,14 +27,18 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
             _appSettings= appSettings.Value;
         }
 
-        public Task<ServiceResponse<Product>> CreateProductAsync(Product product)
+        public async Task<ServiceResponse<Product>> CreateProductAsync(Product product)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PostAsJsonAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint, product);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Product>>();
+            return result;
         }
 
-        public Task<ServiceResponse<bool>> DeleteProductAsync(int id)
+        public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.DeleteAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint + $"/{id}");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            return result;
         }
 
 
@@ -59,9 +64,21 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
             return result;
         }
 
-        public Task<ServiceResponse<Product>> UpdateProductAsync(Product product)
+        // wersja 1 
+        //public async Task<ServiceResponse<Product>> UpdateProductAsync(Product product)
+        //{
+        //    var response = await _httpClient.PutAsJsonAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint, product);
+        //    var json = await response.Content.ReadAsStringAsync();
+        //    var result = JsonConvert.DeserializeObject<ServiceResponse<Product>>(json);
+        //    return result;
+        //}
+
+        // wersja 2 
+        public async Task<ServiceResponse<Product>> UpdateProductAsync(Product product)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PutAsJsonAsync(_appSettings.BaseProductEndpoint.GetAllProductsEndpoint, product);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Product>>();
+            return result;
         }
     }
 }

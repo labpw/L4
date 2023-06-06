@@ -34,7 +34,7 @@ namespace P05Shop.API.Services.ProductService
             _dataContext.Products.Remove(product);
             await _dataContext.SaveChangesAsync();
 
-            return new ServiceResponse<bool>() {  Data = true };
+            return new ServiceResponse<bool>() {  Data = true, Success = true };
         }
 
         public async Task<ServiceResponse<List<Product>>> GetProductsAsync()
@@ -66,18 +66,32 @@ namespace P05Shop.API.Services.ProductService
 
         public async Task<ServiceResponse<Product>> UpdateProductAsync(Product product)
         {
-            var productToEdit = new Product() { Id = product.Id };
-            _dataContext.Products.Attach(productToEdit);
+            try
+            {
+                var productToEdit = new Product() { Id = product.Id };
+                _dataContext.Products.Attach(productToEdit);
 
-            productToEdit.Title = product.Title;
-            productToEdit.Description = product.Description;
-            productToEdit.Price = product.Price;
-            productToEdit.Barcode = product.Barcode;
-            productToEdit.ReleaseDate = product.ReleaseDate;
+                productToEdit.Title = product.Title;
+                productToEdit.Description = product.Description;
+                productToEdit.Price = product.Price;
+                productToEdit.Barcode = product.Barcode;
+                productToEdit.ReleaseDate = product.ReleaseDate;
 
-            await _dataContext.SaveChangesAsync();
+                await _dataContext.SaveChangesAsync();
+                return new ServiceResponse<Product> { Data = productToEdit, Success = true };
+            }
+            catch (Exception)
+            {
+                return new ServiceResponse<Product>
+                {
+                    Data = null,
+                    Success = false,
+                    Message = "An error occured while updating product"
+                };
+            }
+            
 
-            return new ServiceResponse<Product> { Data = productToEdit };
+            
         }
     }
 }
