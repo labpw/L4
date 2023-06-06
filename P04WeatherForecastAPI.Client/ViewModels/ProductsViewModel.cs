@@ -83,6 +83,7 @@ namespace P04WeatherForecastAPI.Client.ViewModels
         public async void ShowDetails(Product product)
         {
             _productDetailsView.Show();
+            _productDetailsView.DataContext = product;
         }
 
     }
