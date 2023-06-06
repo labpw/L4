@@ -83,6 +83,7 @@ namespace P04WeatherForecastAPI.Client
             services.AddTransient<MainWindow>();
             services.AddTransient<FavoriteCitiesView>();
             services.AddTransient<ShopProductsView>();
+            services.AddTransient<ProductDetailsView>();
         }
 
         private void ConfigureHttpClients(IServiceCollection services, AppSettings appSettingsSection)

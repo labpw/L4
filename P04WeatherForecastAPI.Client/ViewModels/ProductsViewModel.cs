@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using P04WeatherForecastAPI.Client.Models;
 using P04WeatherForecastAPI.Client.Services.WeatherServices;
 using P06Shop.Shared.Services.ProductService;
@@ -16,14 +17,15 @@ namespace P04WeatherForecastAPI.Client.ViewModels
     public partial class ProductsViewModel : ObservableObject
     {
         private readonly IProductService _productService;
-
+        private readonly ProductDetailsView _productDetailsView;
         public ObservableCollection<Product> Products { get; set; }
 
         [ObservableProperty]
         private Product selectedProduct;  
 
-        public ProductsViewModel(IProductService productService)
+        public ProductsViewModel(IProductService productService, ProductDetailsView productDetailsView)
         {
+            _productDetailsView = productDetailsView;
             _productService = productService;
             Products = new ObservableCollection<Product>();          
         }
@@ -77,6 +79,11 @@ namespace P04WeatherForecastAPI.Client.ViewModels
             GetProducts();
         }
 
+        [RelayCommand]
+        public async void ShowDetails(Product product)
+        {
+            _productDetailsView.Show();
+        }
 
     }
 }
