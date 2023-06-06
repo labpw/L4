@@ -19,6 +19,9 @@ namespace P04WeatherForecastAPI.Client.ViewModels
 
         public ObservableCollection<Product> Products { get; set; }
 
+        [ObservableProperty]
+        private Product selectedProduct;  
+
         public ProductsViewModel(IProductService productService)
         {
             _productService = productService;
@@ -36,6 +39,44 @@ namespace P04WeatherForecastAPI.Client.ViewModels
                 }
             }
         }
+
+        public async void CreateProduct()
+        {
+            var newProduct = new Product()
+            {
+                Title = selectedProduct.Title,
+                Description = selectedProduct.Description,
+                Barcode = selectedProduct.Barcode,
+                Price = selectedProduct.Price,
+                ReleaseDate = selectedProduct.ReleaseDate,
+            };
+
+            await _productService.CreateProductAsync(newProduct);
+            GetProducts();
+        }
+
+        public async void UpdateProduct()
+        {
+            var productToUpdate = new Product()
+            {
+                Id = selectedProduct.Id,
+                Title = selectedProduct.Title,
+                Description = selectedProduct.Description,
+                Barcode = selectedProduct.Barcode,
+                Price = selectedProduct.Price,
+                ReleaseDate = selectedProduct.ReleaseDate,
+            };
+
+            await _productService.UpdateProductAsync(productToUpdate);
+            GetProducts();
+        }
+
+        public async void DeleteProduct()
+        {
+            await _productService.DeleteProductAsync(selectedProduct.Id);
+            GetProducts();
+        }
+
 
     }
 }
