@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using P04WeatherForecastAPI.Client.Models;
 using P04WeatherForecastAPI.Client.Services.WeatherServices;
+using P06Shop.Shared.MessageBox;
 using P06Shop.Shared.Services.ProductService;
 using P06Shop.Shared.Shop;
 using System;
@@ -10,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Documents;
 
 namespace P04WeatherForecastAPI.Client.ViewModels
@@ -18,24 +20,27 @@ namespace P04WeatherForecastAPI.Client.ViewModels
     {
         private readonly IProductService _productService;
         private readonly ProductDetailsView _productDetailsView;
+        private readonly IMessageDialogService _messageDialogService;
         public ObservableCollection<Product> Products { get; set; }
 
-    
+
 
         [ObservableProperty]
         private Product selectedProduct;
 
-     
 
-        public ProductsViewModel(IProductService productService, ProductDetailsView productDetailsView)
+
+        public ProductsViewModel(IProductService productService, ProductDetailsView productDetailsView, IMessageDialogService messageDialogService)
         {
+            _messageDialogService = messageDialogService;
             _productDetailsView = productDetailsView;
             _productService = productService;
-            Products = new ObservableCollection<Product>();          
+            Products = new ObservableCollection<Product>();
         }
 
-        public async void GetProducts()
+        public async Task GetProducts()
         {
+            Products.Clear();
             var productsResult = await _productService.GetProductsAsync();
             if (productsResult.Success)
             {
@@ -46,7 +51,7 @@ namespace P04WeatherForecastAPI.Client.ViewModels
             }
         }
 
-        public async void CreateProduct()
+        public async Task CreateProduct()
         {
             var newProduct = new Product()
             {
@@ -57,11 +62,14 @@ namespace P04WeatherForecastAPI.Client.ViewModels
                 ReleaseDate = selectedProduct.ReleaseDate,
             };
 
-            await _productService.CreateProductAsync(newProduct);
-            GetProducts();
+            var result =  await _productService.CreateProductAsync(newProduct);
+            if (result.Success)
+                await GetProducts();
+            else
+                _messageDialogService.ShowMessage(result.Message);  
         }
 
-        public async void UpdateProduct()
+        public async Task UpdateProduct()
         {
             var productToUpdate = new Product()
             {
@@ -77,48 +85,51 @@ namespace P04WeatherForecastAPI.Client.ViewModels
             GetProducts();
         }
 
-        public async void DeleteProduct()
+        public async Task DeleteProduct()
         {
             await _productService.DeleteProductAsync(selectedProduct.Id);
-            GetProducts();
+            await GetProducts();
         }
 
         [RelayCommand]
-        public async void ShowDetails(Product product)
+        public async Task ShowDetails(Product product)
         {
             _productDetailsView.Show();
             _productDetailsView.DataContext = this;
-            selectedProduct = product;
-            OnPropertyChanged("SelectedProduct");
+            //selectedProduct = product;
+            //OnPropertyChanged("SelectedProduct");
+            SelectedProduct = product;
         }
 
 
         [RelayCommand]
-        public async void Save()
+        public async Task Save()
         {
-            if (selectedProduct.Id ==0)
+            if (selectedProduct.Id == 0)
             {
                 CreateProduct();
-            }else
+            }
+            else
             {
                 UpdateProduct();
             }
-            
+
         }
 
         [RelayCommand]
-        public async void Delete()
+        public async Task Delete()
         {
             DeleteProduct();
         }
 
         [RelayCommand]
-        public async void New()
+        public async Task New()
         {
             _productDetailsView.Show();
             _productDetailsView.DataContext = this;
-            selectedProduct = new Product();
-            OnPropertyChanged("SelectedProduct");
+            //selectedProduct = new Product();
+            //OnPropertyChanged("SelectedProduct");
+            SelectedProduct = new Product(); 
         }
 
 

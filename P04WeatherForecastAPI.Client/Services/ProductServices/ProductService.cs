@@ -19,6 +19,7 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
 {
     internal class ProductService : IProductService
     {
+
         private readonly HttpClient _httpClient;
         private readonly AppSettings _appSettings;
         public ProductService(HttpClient httpClient, IOptions<AppSettings> appSettings)
@@ -36,17 +37,11 @@ namespace P04WeatherForecastAPI.Client.Services.ProductServices
 
         public async Task<ServiceResponse<bool>> DeleteProductAsync(int id)
         {
-            using(HttpClient _httpClient = new HttpClient())
-            {
-                _httpClient.BaseAddress = new Uri(_appSettings.BaseAPIUrl);
-                var response = await _httpClient.DeleteAsync(_appSettings.BaseProductEndpoint.Base_url + $"/{id}");
-                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
-                return result;
-            }
-            //_httpClient.BaseAddress = new Uri(_appSettings.BaseAPIUrl);
-            //var response = await _httpClient.DeleteAsync(_appSettings.BaseProductEndpoint.Base_url+ $"/{id}");
-            //var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
-            //return result;
+            // jesli uzyjemy / na poczatku to wtedy sciezka trakktowana jest od root czyli pomija czesc środkową adresu 
+            // zazwyczaj unikamy stosowania / na poczatku 
+            var response = await _httpClient.DeleteAsync($"{id}");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            return result;
         }
 
 
