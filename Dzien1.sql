@@ -8,6 +8,7 @@ create table Osoby
   Wzrost decimal(5,2), -- np: 125.34
   DataUr datetime2 -- data z czasem 
 )
+--
 
 select * from Osoby
 
